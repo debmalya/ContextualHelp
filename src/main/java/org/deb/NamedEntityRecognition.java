@@ -15,13 +15,22 @@
  */
 package org.deb;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Scanner;
+
+import org.deb.model.SentimentResult;
 
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
+import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreAnnotations.AnswerAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
+import edu.stanford.nlp.util.CoreMap;
 
 /**
  * @author debmalyajash
@@ -57,7 +66,7 @@ public class NamedEntityRecognition {
 				// Display the feedback.
 				// Want to try more ?
 				classify(customerFeedback);
-				// System.out.println(classifier.classifyToString(customerFeedback));
+				analyzeSentiment(customerFeedback);
 
 			}
 
@@ -71,6 +80,7 @@ public class NamedEntityRecognition {
 		int count = 0;
 		List<List<CoreLabel>> out = classifier.classify(customerFeedback);
 		for (List<CoreLabel> sentence : out) {
+			count = 0;
 			for (CoreLabel word : sentence) {
 				String customerWord = word.word();
 				String customerWordAnnotation = word.get(AnswerAnnotation.class);
@@ -79,12 +89,41 @@ public class NamedEntityRecognition {
 					count++;
 				}
 			}
+			
 			if (count > 0) {
 				System.out.println();
-			} else {
-				System.out.println("Sorry, no annotation found");
 			}
+			
 		}
+		
+		
+	}
+
+	/**
+	 * 
+	 * @param customerFeedback
+	 */
+	public static List<SentimentResult>  analyzeSentiment(String customerFeedback) {
+		// This part is for sentiment analysis
+		List<SentimentResult> sentimentResultList = new ArrayList<>();
+		Properties props = new Properties();
+		props.setProperty("annotators", "tokenize, ssplit, pos, lemma, parse, sentiment");
+		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+		Annotation annotation = pipeline.process(customerFeedback);
+		List<CoreMap> sentences = annotation.get(CoreAnnotations.SentencesAnnotation.class);
+		for (CoreMap sentence : sentences) {
+		  String sentiment = sentence.get(SentimentCoreAnnotations.SentimentClass.class);
+		  System.out.println(sentiment + "\t" + sentence);
+		  
+		  // Instantiate new SentimentResult object and set its properties
+		  SentimentResult sr = new SentimentResult(sentiment,sentence.toString());
+		  
+		  
+		  sentimentResultList.add(sr);
+		  
+		}
+		
+		return sentimentResultList;
 	}
 
 }
