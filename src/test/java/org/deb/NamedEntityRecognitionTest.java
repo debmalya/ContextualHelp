@@ -60,7 +60,7 @@ public class NamedEntityRecognitionTest {
 				.analyzeSentiment("Bussiness people will feel frustrated, what the use of it?");
 		Assert.assertTrue(!result.isEmpty());
 		Assert.assertTrue(result.size() == 1);
-		Assert.assertTrue(result.get(0).getSentiment().equals("Neutral"));
+		Assert.assertTrue(result.get(0).getSentiment().equals("Negative"));
 	}
 
 }
