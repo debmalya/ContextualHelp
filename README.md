@@ -1,5 +1,5 @@
 # ContextualHelp
-To provide contextual help. Domain : Customer Feeback Analysis, using Standford Core-NLP.
+To provide contextual help. Domain : Customer Feeback Analysis, using Stanford Core-NLP.
 
 Prerequisites
 * Java 1.8
