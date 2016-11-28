@@ -15,10 +15,9 @@
  */
 package org.deb;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
 
+import org.deb.model.NERResult;
 import org.deb.model.SentimentResult;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,30 +36,47 @@ public class NamedEntityRecognitionTest {
 	@Test
 	public final void testAnalyzeSentiment() {
 		// Test for Neutral
-		List<SentimentResult> result = NamedEntityRecognition
-				.analyzeSentiment("I am using stanford core-nlp");
+		List<SentimentResult> result = NamedEntityRecognition.analyzeSentiment("I am using stanford core-nlp");
 		Assert.assertTrue(!result.isEmpty());
 		Assert.assertTrue(result.size() == 1);
 		Assert.assertTrue(result.get(0).getSentiment().equals("Neutral"));
-		result = NamedEntityRecognition
-				.analyzeSentiment("But not sure how to use it in a profitable business");
+		result = NamedEntityRecognition.analyzeSentiment("But not sure how to use it in a profitable business");
 		Assert.assertTrue(!result.isEmpty());
 		Assert.assertTrue(result.size() == 1);
 		Assert.assertTrue(result.get(0).getSentiment().equals("Neutral"));
 
 		// Test for Positive
-		result = NamedEntityRecognition
-				.analyzeSentiment("It is exciting to use stanford core-nlp");
+		result = NamedEntityRecognition.analyzeSentiment("It is exciting to use stanford core-nlp");
 		Assert.assertTrue(!result.isEmpty());
 		Assert.assertTrue(result.size() == 1);
 		Assert.assertTrue(result.get(0).getSentiment().equals("Positive"));
 
 		// Test for Negative
-		result = NamedEntityRecognition
-				.analyzeSentiment("Bussiness people will feel frustrated, what the use of it?");
+		result = NamedEntityRecognition.analyzeSentiment("Bussiness people will feel frustrated, what the use of it?");
 		Assert.assertTrue(!result.isEmpty());
 		Assert.assertTrue(result.size() == 1);
 		Assert.assertTrue(result.get(0).getSentiment().equals("Negative"));
+	}
+
+	@Test
+	public final void testNER() {
+		List<NERResult> result = NamedEntityRecognition
+				.classify("We are trying to achieve 100% success with stanford NLP. "
+						+ "But we are new in it. We do not know how to use it properly. Mr. Business owner of ABC Inc. will spend no more money int it. "
+						+ "We have till next Friday to show something meaningful before leaving Chandannagar.");
+		Assert.assertNotNull(result);
+		Assert.assertEquals(3, result.size());
+
+		for (int i = 0; i < result.size(); i++) {
+			NERResult eachResult = result.get(i);
+			switch (i) {
+			case 0:
+				Assert.assertEquals("We are trying to achieve 100% success with stanford NLP. ", eachResult.getSentence());
+				
+				break;
+			}
+		}
+
 	}
 
 }

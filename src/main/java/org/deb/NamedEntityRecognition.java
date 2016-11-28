@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 
+import org.deb.model.NERResult;
 import org.deb.model.SentimentResult;
 
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
@@ -76,26 +77,32 @@ public class NamedEntityRecognition {
 	/**
 	 * @param customerFeedback
 	 */
-	public static void classify(String customerFeedback) {
+	public static List<NERResult> classify(String customerFeedback) {
 		int count = 0;
 		List<List<CoreLabel>> out = classifier.classify(customerFeedback);
+		List<NERResult> nerResult = new ArrayList<>();
 		for (List<CoreLabel> sentence : out) {
 			count = 0;
+			List<String> eachNerResult = new ArrayList<>();
 			for (CoreLabel word : sentence) {
 				String customerWord = word.word();
 				String customerWordAnnotation = word.get(AnswerAnnotation.class);
 				if (!customerWordAnnotation.equals("O")) {
 					System.out.print(customerWord + '/' + customerWordAnnotation + ' ');
 					count++;
+					eachNerResult.add(customerWord + '/' + customerWordAnnotation );
 				}
 			}
 			
 			if (count > 0) {
 				System.out.println();
+				NERResult result = new NERResult(eachNerResult, sentence.toString());
+				nerResult.add(result);
 			}
 			
 		}
 		
+		return nerResult;
 		
 	}
 
