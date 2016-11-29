@@ -66,9 +66,13 @@ public class NamedEntityRecognition {
 				// Recognize the feedback.
 				// Display the feedback.
 				// Want to try more ?
+				System.out.println("=== Stanford Classification ===");
 				classify(customerFeedback);
+				System.out.println("=== Stanford sentiment analysis ===");
 				analyzeSentiment(customerFeedback);
 
+			} else {
+				System.err.println("ERR: please enter something to evaluate.");
 			}
 
 		}
