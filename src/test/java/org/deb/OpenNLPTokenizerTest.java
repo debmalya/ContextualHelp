@@ -35,6 +35,8 @@ import opennlp.tools.util.InvalidFormatException;
 public class OpenNLPTokenizerTest {
 	
 	private static final String SENTENCE = "Mr. X and Mr. Y are two good friends.";
+	
+	private static final String TAG_SENTENCE = "Most large cities in the US had morning and afternoon newspapers, .";
 
 	/**
 	 * @throws java.lang.Exception
@@ -51,7 +53,7 @@ public class OpenNLPTokenizerTest {
 		try {
 			OpenNLPTokenizer openNLPTokenizer = new OpenNLPTokenizer();
 			openNLPTokenizer.getNames(SENTENCE);
-			openNLPTokenizer.getTags(SENTENCE);
+			openNLPTokenizer.getTags(TAG_SENTENCE);
 			openNLPTokenizer.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
