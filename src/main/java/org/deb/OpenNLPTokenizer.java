@@ -18,9 +18,12 @@ package org.deb;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.postag.POSModel;
+import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.Span;
 
@@ -30,11 +33,17 @@ import opennlp.tools.util.Span;
  */
 public class OpenNLPTokenizer {
 
-	private static InputStream modelIn = null;
+	private static InputStream modelIn;
 
-	private static TokenNameFinderModel model = null;
+	private static InputStream modelInPOS;
 
-	private static NameFinderME nameFinder = null;
+	private static TokenNameFinderModel model;
+
+	private static NameFinderME nameFinder;
+
+	private static POSModel posModel;
+
+	private static POSTaggerME tagger;
 
 	/**
 	 * Default constructor.
@@ -54,6 +63,18 @@ public class OpenNLPTokenizer {
 
 		if (nameFinder == null) {
 			nameFinder = new NameFinderME(model);
+		}
+
+		if (modelInPOS == null) {
+			modelInPOS = new FileInputStream("./src/main/resources/en-pos-maxent.bin");
+		}
+
+		if (posModel == null) {
+			posModel = new POSModel(modelInPOS);
+		}
+
+		if (tagger == null) {
+			tagger = new POSTaggerME(posModel);
 		}
 	}
 
@@ -75,11 +96,24 @@ public class OpenNLPTokenizer {
 
 		nameFinder.clearAdaptiveData();
 	}
+	
+	public synchronized void getTags(final String sentences){
+		String[] allSentences = sentences.split(".");
+		String tags[] = tagger.tag(allSentences);
+	}
 
 	public void close() {
-		if (modelIn != null) {
+		closeInputStream(modelIn);
+		closeInputStream(modelInPOS);
+	}
+
+	/**
+	 * 
+	 */
+	public void closeInputStream(InputStream inputStream) {
+		if (inputStream != null) {
 			try {
-				modelIn.close();
+				inputStream.close();
 			} catch (IOException ignore) {
 			}
 		}

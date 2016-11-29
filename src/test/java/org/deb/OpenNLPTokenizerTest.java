@@ -33,6 +33,8 @@ import opennlp.tools.util.InvalidFormatException;
  *
  */
 public class OpenNLPTokenizerTest {
+	
+	private static final String SENTENCE = "Mr. X and Mr. Y are two good friends.";
 
 	/**
 	 * @throws java.lang.Exception
@@ -48,7 +50,8 @@ public class OpenNLPTokenizerTest {
 	public void testOpenNLPTokenizer() {
 		try {
 			OpenNLPTokenizer openNLPTokenizer = new OpenNLPTokenizer();
-			openNLPTokenizer.getNames("Mr. X and Mr. Y are two good friends.");
+			openNLPTokenizer.getNames(SENTENCE);
+			openNLPTokenizer.getTags(SENTENCE);
 			openNLPTokenizer.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
