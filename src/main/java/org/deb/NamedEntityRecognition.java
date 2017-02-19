@@ -60,7 +60,7 @@ public class NamedEntityRecognition {
 
 		try (Scanner in = new Scanner(System.in)) {
 
-			System.out.println("Enter customer feedback :");
+			System.out.println("Enter your text :");
 			String customerFeedback = in.nextLine();
 			if (customerFeedback != null && customerFeedback.trim().length() > 0) {
 				// Recognize the feedback.
@@ -70,6 +70,7 @@ public class NamedEntityRecognition {
 				classify(customerFeedback);
 				System.out.println("=== Stanford sentiment analysis ===");
 				analyzeSentiment(customerFeedback);
+				tagPOS(customerFeedback);
 
 			} else {
 				System.err.println("ERR: please enter something to evaluate.");
@@ -94,27 +95,27 @@ public class NamedEntityRecognition {
 				if (!customerWordAnnotation.equals("O")) {
 					System.out.print(customerWord + '/' + customerWordAnnotation + ' ');
 					count++;
-					eachNerResult.add(customerWord + '/' + customerWordAnnotation );
+					eachNerResult.add(customerWord + '/' + customerWordAnnotation);
 				}
 			}
-			
+
 			if (count > 0) {
 				System.out.println();
 				NERResult result = new NERResult(eachNerResult, sentence.toString());
 				nerResult.add(result);
 			}
-			
+
 		}
-		
+
 		return nerResult;
-		
+
 	}
 
 	/**
 	 * 
 	 * @param customerFeedback
 	 */
-	public static List<SentimentResult>  analyzeSentiment(String customerFeedback) {
+	public static List<SentimentResult> analyzeSentiment(String customerFeedback) {
 		// This part is for sentiment analysis
 		List<SentimentResult> sentimentResultList = new ArrayList<>();
 		Properties props = new Properties();
@@ -123,18 +124,52 @@ public class NamedEntityRecognition {
 		Annotation annotation = pipeline.process(customerFeedback);
 		List<CoreMap> sentences = annotation.get(CoreAnnotations.SentencesAnnotation.class);
 		for (CoreMap sentence : sentences) {
-		  String sentiment = sentence.get(SentimentCoreAnnotations.SentimentClass.class);
-		  System.out.println(sentiment + "\t" + sentence);
-		  
-		  // Instantiate new SentimentResult object and set its properties
-		  SentimentResult sr = new SentimentResult(sentiment,sentence.toString());
-		  
-		  
-		  sentimentResultList.add(sr);
-		  
+			String sentiment = sentence.get(SentimentCoreAnnotations.SentimentClass.class);
+			System.out.println(sentiment + "\t" + sentence);
+
+			// Instantiate new SentimentResult object and set its properties
+			SentimentResult sr = new SentimentResult(sentiment, sentence.toString());
+
+			sentimentResultList.add(sr);
+
 		}
-		
+
 		return sentimentResultList;
 	}
 
+	public static List<String> tagPOS(String text) {
+		List<String> posList = new ArrayList<>();
+
+		Properties props = new Properties();
+		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+
+		// create an empty Annotation just with the given text
+		Annotation document = new Annotation(text);
+
+		// run all Annotators on this text
+		pipeline.annotate(document);
+
+		// these are all the sentences in this document
+		// a CoreMap is essentially a Map that uses class objects as keys and
+		// has values with custom types
+		List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
+		for (CoreMap sentence : sentences) {
+			// traversing the words in the current sentence
+			// a CoreLabel is a CoreMap with additional token-specific methods
+			for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
+				// this is the text of the token
+				String word = token.get(CoreAnnotations.TextAnnotation.class);
+				// this is the POS tag of the token
+				String pos = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
+				// this is the NER label of the token
+				posList.add(pos);
+				String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+
+				System.out.println("word: " + word + " pos: " + pos + " ne:" + ne);
+			}
+			
+		}
+		return posList;
+	}
 }
